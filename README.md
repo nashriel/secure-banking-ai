@@ -1,10 +1,13 @@
-# 🛡️ Secure Online Banking System with AI-Based Fraud Detection
+
+
+
+# Secure Online Banking System with AI-Based Fraud Detection
 
 A modern web-based online banking system built with **Python, Flask, and Machine Learning** to ensure secure transactions and detect fraud in real-time.
 
 ---
 
-## 📌 Key Features
+##  Key Features
 
 -  User registration and login with hashed passwords
 -  Fraud detection using a trained ML model (Random Forest/XGBoost)
@@ -42,3 +45,67 @@ secure-banking-ai/
 ├── requirements.txt              # Python dependencies
 ├── README.md                     # Project overview (this file)
 └── .gitignore                    # Ignore venv, __pycache__, etc.
+````
+
+---
+
+## Setup Instructions
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/yourusername/secure-banking-ai.git
+cd secure-banking-ai
+```
+
+### 2. Set Up Virtual Environment
+
+```bash
+python -m venv venv
+source venv/bin/activate     # On Windows: venv\Scripts\activate
+```
+
+### 3. Install Requirements
+
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Run the App
+
+```bash
+python run.py
+```
+
+App will be available at `http://localhost:5000/`
+
+---
+
+##  AI Model (Fraud Detection)
+
+* **Input Features**: transaction amount, type, location, user frequency, etc.
+* **Algorithm**: Random Forest / XGBoost
+* **Output**: Legitimate or Fraudulent transaction
+* **Explainability**: Optional SHAP integration
+
+---
+
+##  Future Enhancements
+
+* 2FA using Twilio for login/transaction
+* Blockchain-style transaction logging
+* SHAP/LIME explanations for model predictions
+* Real-time notifications to admin
+
+---
+
+##  License
+
+This project is licensed under the **MIT License**.
+
+---
+
+##  Contributing
+
+Pull requests are welcome! Please open an issue first to discuss proposed changes.
+
