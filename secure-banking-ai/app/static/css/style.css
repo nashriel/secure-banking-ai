@@ -1,0 +1,50 @@
+/* Apply Apple-like system font globally */
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  transition: background 0.4s ease;
+}
+
+.hero {
+  min-height: 100vh;
+  background: linear-gradient(to bottom right, #53b4a3, #32786d);
+  padding: 60px 0;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.btn-light,
+.btn-outline-light {
+  border-radius: 30px;
+  padding: 10px 30px;
+  font-weight: 500;
+  font-size: 16px;
+}
+
+img.img-fluid {
+  max-height: 550px;
+  border: none;
+  box-shadow: none;
+}
+
+/* Curved Divider */
+.custom-shape-divider-bottom-hero {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  overflow: hidden;
+  line-height: 0;
+}
+
+.custom-shape-divider-bottom-hero svg {
+  position: relative;
+  display: block;
+  width: calc(120% + 1.3px);
+  height: 120px;
+}
+
+.custom-shape-divider-bottom-hero .shape-fill {
+  fill: #ffffff;
+}

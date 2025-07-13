@@ -1,0 +1,7 @@
+Flask
+Flask-WTF
+pandas
+scikit-learn
+xgboost
+weasyprint
+matplotlib
