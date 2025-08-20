@@ -5,162 +5,216 @@
   <title>SecureBank - Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
   <link href="{{ url_for('static', filename='css/dashboard.css') }}" rel="stylesheet" />
+  <style>
+    body {
+      background-color: #1b2e1b;
+      font-family: 'Segoe UI', sans-serif;
+      color: #e0f2f1;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      background-color: #1b5e20;
+      min-height: 100vh;
+      padding: 1.5rem 1rem;
+    }
+    .sidebar h4 {
+      color: #c8e6c9;
+    }
+    .sidebar .nav-link {
+      color: #e0f2f1;
+      margin-bottom: 1rem;
+      font-weight: 500;
+      transition: background 0.3s;
+    }
+    .sidebar .nav-link:hover {
+      background-color: #2e7d32;
+      border-radius: 8px;
+    }
+
+    /* Navbar */
+    .navbar {
+      background-color: #2e7d32 !important;
+    }
+    .navbar-brand, .navbar-text {
+      color: #ffffff !important;
+    }
+
+    /* Cards */
+    .card-base {
+      background-color: #33691e;
+      border-radius: 12px;
+      color: #e0f2f1;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeUp 0.6s ease-out forwards;
+    }
+    .balance-card {
+      background-color: #2e7d32;
+      border-radius: 12px;
+      color: #ffffff;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeUp 0.6s ease-out forwards;
+    }
+    .table-responsive {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeUp 0.6s ease-out forwards;
+    }
+
+    
+   
+    /* Tables */
+    .table-dark {
+      background-color: #1b5e20;
+      color: #ffffff;
+    }
+    .table-hover tbody tr:hover {
+      background-color: #2e7d32;
+    }
+
+    h5, h6 {
+      color: #c8e6c9;
+    }
+    .card-text {
+      color: #ffffff;
+    }
+    .text-success {
+      color: #a5d6a7 !important;
+    }
+    .text-danger {
+      color: #ef9a9a !important;
+    }
+  </style>
 </head>
 <body>
-  <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg bg-transparent sticky-top shadow-sm rounded-4 mx-3 mt-3">
-    <div class="container-fluid">
-      <a class="navbar-brand fw-bold text-white" href="#">SecureBank</a>
-      <div class="ms-auto d-flex align-items-center">
-        <span class="navbar-text text-white me-3">Welcome, Asriel</span>
-        <a href="/" class="btn btn-outline-light btn-sm">Logout</a>
-      </div>
-    </div>
-  </nav>
-
-  <!-- Dashboard -->
-  <div class="container py-5">
-    <div class="row mb-5">
-      <!-- Debit Card -->
-      <div class="col-md-6 mb-4">
-        <div class="card-base p-4 shadow">
-          <div class="d-flex justify-content-between align-items-center mb-3">
-            <div>
-              <h5 class="mb-0">SecureBank</h5>
-              <small>Virtual Debit Card</small>
-            </div>
-            <img src="{{ url_for('static', filename='img/chip.png') }}" alt="chip" style="width:40px;" />
-          </div>
-          <div class="card-number mb-3">**** **** **** 2048</div>
-          <div class="d-flex justify-content-between">
-            <div>
-              <small>Card Holder</small>
-              <div class="fw-bold">Asriel Nhembo</div>
-            </div>
-            <div class="text-end">
-              <small>Valid Thru</small>
-              <div class="fw-bold">12/27</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Credit Card -->
-      <div class="col-md-6 mb-4">
-        <div class="card-base p-4 shadow">
-          <div class="d-flex justify-content-between align-items-center mb-3">
-            <div>
-              <h5 class="mb-0">SecureBank</h5>
-              <small>Virtual Credit Card</small>
-            </div>
-            <img src="{{ url_for('static', filename='img/chip.png') }}" alt="chip" style="width:40px;" />
-          </div>
-          <div class="card-number mb-3">**** **** **** 9976</div>
-          <div class="d-flex justify-content-between">
-            <div>
-              <small>Card Holder</small>
-              <div class="fw-bold">Asriel Nhembo</div>
-            </div>
-            <div class="text-end">
-              <small>Valid Thru</small>
-              <div class="fw-bold">11/29</div>
-            </div>
-          </div>
-        </div>
-      </div>
+  <div class="d-flex">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <h4 class="mb-4">SecureBank</h4>
+      <ul class="nav flex-column">
+        <li class="nav-item">
+          <a class="nav-link" href="#"><i class="bi bi-house-door me-2"></i>Dashboard</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#"><i class="bi bi-credit-card me-2"></i>Cards</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#"><i class="bi bi-cash-stack me-2"></i>Transactions</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#"><i class="bi bi-file-earmark-text me-2"></i>Reports</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#"><i class="bi bi-gear me-2"></i>Settings</a>
+        </li>
+      </ul>
     </div>
 
-    <!-- Financial Cards -->
-    <div class="row g-4 mb-5">
-      <div class="col-md-4">
-        <div class="card balance-card shadow text-center p-3">
-          <h6 class="card-title">Current Balance</h6>
-          <h3 class="card-text">$12,350.00</h3>
+    <!-- Main Content -->
+    <div class="flex-grow-1">
+      <!-- Navbar -->
+      <nav class="navbar navbar-expand-lg sticky-top shadow-sm rounded-4 mx-3 mt-3">
+        <div class="container-fluid">
+          <a class="navbar-brand fw-bold" href="#">SecureBank</a>
+          <div class="ms-auto d-flex align-items-center">
+            <span class="navbar-text me-3">Welcome, Asriel</span>
+            <a href="/" class="btn btn-outline-light btn-sm">Logout</a>
+          </div>
         </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card balance-card shadow text-center p-3">
-          <h6 class="card-title">Income</h6>
-          <h4 class="card-text text-success">+ $4,000</h4>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card balance-card shadow text-center p-3">
-          <h6 class="card-title">Expenses</h6>
-          <h4 class="card-text text-danger">- $1,200</h4>
-        </div>
-      </div>
-    </div>
+      </nav>
 
-    <!-- Tables Section -->
-    <div class="row g-4">
-      <!-- Recent Transactions -->
-      <div class="col-md-6">
-        <h5 class="mb-3 text-white">Recent Transactions</h5>
-        <div class="table-responsive shadow rounded-4 overflow-hidden">
-          <table class="table table-hover table-bordered mb-0">
-            <thead class="table-dark">
-              <tr>
-                <th>Date</th>
-                <th>Description</th>
-                <th>Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>2025-07-10</td>
-                <td>Grocery Store</td>
-                <td class="text-danger">- $65.00</td>
-              </tr>
-              <tr>
-                <td>2025-07-09</td>
-                <td>Salary</td>
-                <td class="text-success">+ $4,000.00</td>
-              </tr>
-              <tr>
-                <td>2025-07-08</td>
-                <td>Electricity Bill</td>
-                <td class="text-danger">- $120.00</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <!-- Dashboard -->
+      <div class="container py-5">
+        <div class="row mb-5">
+          <!-- Debit Card -->
+          <div class="col-md-6 mb-4">
+            <div class="card-base p-4 shadow">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                  <h5 class="mb-0">SecureBank</h5>
+                  <small>Virtual Debit Card</small>
+                </div>
+                <img src="{{ url_for('static', filename='img/chip.png') }}" alt="chip" style="width:40px;" />
+              </div>
+              <div class="card-number mb-3">**** **** **** 2048</div>
+              <div class="d-flex justify-content-between">
+                <div>
+                  <small>Card Holder</small>
+                  <div class="fw-bold">Asriel Nhembo</div>
+                </div>
+                <div class="text-end">
+                  <small>Valid Thru</small>
+                  <div class="fw-bold">12/27</div>
+                </div>
+              </div>
+            </div>
+          </div>
 
-      <!-- Subscriptions -->
-      <div class="col-md-6">
-        <h5 class="mb-3 text-white">Subscriptions</h5>
-        <div class="table-responsive shadow rounded-4 overflow-hidden">
-          <table class="table table-hover table-bordered mb-0">
-            <thead class="table-dark">
-              <tr>
-                <th>Service</th>
-                <th>Plan</th>
-                <th>Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Netflix</td>
-                <td>Standard</td>
-                <td>$15.99</td>
-              </tr>
-              <tr>
-                <td>Spotify</td>
-                <td>Premium</td>
-                <td>$9.99</td>
-              </tr>
-              <tr>
-                <td>Adobe</td>
-                <td>Creative Cloud</td>
-                <td>$52.99</td>
-              </tr>
-            </tbody>
-          </table>
+          <!-- Credit Card -->
+          <div class="col-md-6 mb-4">
+            <div class="card-base p-4 shadow">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                  <h5 class="mb-0">SecureBank</h5>
+                  <small>Virtual Credit Card</small>
+                </div>
+                <img src="{{ url_for('static', filename='img/chip.png') }}" alt="chip" style="width:40px;" />
+              </div>
+              <div class="card-number mb-3">**** **** **** 9976</div>
+              <div class="d-flex justify-content-between">
+                <div>
+                  <small>Card Holder</small>
+                  <div class="fw-bold">Asriel Nhembo</div>
+                </div>
+                <div class="text-end">
+                  <small>Valid Thru</small>
+                  <div class="fw-bold">11/29</div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
-  </div>
-</body>
-</html>
+
+        <!-- Financial Cards -->
+        <div class="row g-4 mb-5">
+          <div class="col-md-4">
+            <div class="card balance-card shadow text-center p-3">
+              <h6 class="card-title">Current Balance</h6>
+              <h3 class="card-text">$12,350.00</h3>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card balance-card shadow text-center p-3">
+              <h6 class="card-title">Income</h6>
+              <h4 class="card-text text-success">+ $4,000</h4>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card balance-card shadow text-center p-3">
+              <h6 class="card-title">Expenses</h6>
+              <h4 class="card-text text-danger">- $1,200</h4>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tables Section -->
+        <div class="row g-4">
+          <!-- Recent Transactions -->
+          <div class="col-md-6">
+            <h5 class="mb-3">Recent Transactions</h5>
+            <div class="table-responsive shadow rounded-4 overflow-hidden">
+              <table class="table table-hover table-bordered mb-0">
+                <thead class="table-dark">
+                  <tr>
+                    <th>Date</th>
+                    <th>Description</th>
+                    <th>Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>2025-07-10</
