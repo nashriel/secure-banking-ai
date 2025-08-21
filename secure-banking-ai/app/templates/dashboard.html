@@ -7,6 +7,8 @@
 
   <!-- Icons (Bootstrap Icons) -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 
   <style>
     /* -----------------------------
@@ -23,14 +25,32 @@
       --radius-xl: 24px;
       --radius-lg: 20px;
       --radius-md: 14px;
+
+      /* accents */
+      --green: #2e7d32;
+      --red: #c0392b;
+      --ink: #1a2238;
+      --surface: #eaf2ff;
     }
+    /* Dark theme vars */
+    :root[data-theme="dark"]{
+      --text: #ecf2ff;
+      --text-dim: #a8b1d1;
+      --glass: rgba(20,22,40,.35);
+      --border: rgba(255,255,255,.15);
+      --shadow: 0 10px 40px rgba(0,0,0,.45);
+      --ink: #e6ebff;
+      --surface: #0f1324;
+    }
+
     html,body{ height:100%; }
     body{
       margin:0;
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Inter, sans-serif;
       color: var(--text);
       overflow-x: hidden;
-      background: #eaf2ff;
+      background: var(--surface);
+      transition: background .3s ease, color .3s ease;
     }
 
     /* -----------------------------
@@ -42,15 +62,18 @@
       background: radial-gradient(1200px 1200px at 20% 10%, #9ad0ff55 0%, transparent 60%),
                   radial-gradient(900px 900px at 80% 30%, #c49bff55 0%, transparent 60%),
                   radial-gradient(1000px 1000px at 40% 90%, #9affcc55 0%, transparent 60%),
-                  linear-gradient(135deg,#dfe9f3,#ffffff);
+                  linear-gradient(135deg,#dfe9f3,#ffffff00);
       z-index:-2;
+      transition: opacity .3s ease;
     }
+    :root[data-theme="dark"] .bg{ opacity:.45; }
     .bg--blur{
       position: fixed;
       inset: -10px;
       filter: blur(40px) saturate(120%);
       z-index:-1;
       animation: float 14s ease-in-out infinite alternate;
+      pointer-events:none;
     }
     .bg--blur::before,
     .bg--blur::after{
@@ -81,10 +104,10 @@
       gap: 28px;
       padding: 28px;
       min-height: 100dvh;
-      padding-top: clamp(28px, 28px + env(safe-area-inset-top), 48px); /* extra breathing room under Menu btn */
+      padding-top: clamp(36px, 28px + env(safe-area-inset-top), 56px); /* extra breathing room under Menu btn */
     }
     @media (max-width: 960px){
-      .app{ grid-template-columns: 1fr; padding: 20px; padding-top: calc(72px + env(safe-area-inset-top)); }
+      .app{ grid-template-columns: 1fr; padding: 20px; padding-top: calc(80px + env(safe-area-inset-top)); }
     }
 
     /* -----------------------------
@@ -96,6 +119,7 @@
       backdrop-filter: blur(20px) saturate(180%);
       -webkit-backdrop-filter: blur(20px) saturate(180%);
       box-shadow: var(--shadow);
+      transition: background .3s ease, border-color .3s ease, box-shadow .3s ease, transform .25s ease;
     }
 
     /* -----------------------------
@@ -111,6 +135,7 @@
       max-height: calc(100dvh - 40px);
       overflow: auto;
     }
+    :root[data-theme="dark"] .sidebar{ color: var(--text); }
     .brand{
       display:flex; align-items:center; gap:12px;
       padding: 8px 10px 16px;
@@ -135,7 +160,7 @@
       border-radius: 14px;
       color: var(--text);
       text-decoration:none;
-      transition: transform .18s ease, background .25s ease, box-shadow .25s ease;
+      transition: transform .18s ease, background .25s ease, box-shadow .25s ease, border-color .25s ease;
       border:1px solid transparent;
     }
     .nav a i{ font-size: 18px; opacity:.9; }
@@ -162,7 +187,9 @@
       width:38px; height:38px; border-radius: 50%;
       background: radial-gradient(circle at 30% 30%, #fff 0%, #ffffff55 35%, #ffffff20 70%);
       border:1px solid rgba(var(--white),.35);
+      overflow:hidden;
     }
+    .avatar img{ width:100%; height:100%; object-fit: cover; display:block; }
     .user .meta{ line-height: 1.2; }
     .user .meta .name{ font-weight:700; font-size: 14px; }
     .user .meta .role{ font-size: 12px; color: var(--text-dim); }
@@ -178,7 +205,7 @@
       line-height: 1;
     }
     .sidebar-toggle i{ font-size: 18px; }
-    .sidebar-toggle .label{ margin-left: 6px; } /* extra space after icon label */
+    .sidebar-toggle .label{ margin-left: 8px; } /* extra space after icon label */
 
     @media (max-width: 960px){
       .sidebar{
@@ -205,22 +232,47 @@
       border-radius: var(--radius-lg);
     }
     @media (max-width:960px){
-      .topbar{ margin-top: 4px; } /* breathing space under fixed Menu btn */
+      .topbar{ margin-top: 6px; } /* breathing space under fixed Menu btn */
     }
+    .topbar .left, .topbar .right{ display:flex; align-items:center; gap:12px; }
     .topbar .search{
       display:flex; align-items:center; gap:10px; flex: 1 1 420px;
       padding: 10px 12px; border-radius: 12px;
       background: rgba(var(--white),.18); border:1px solid rgba(var(--white),.28);
+      min-width: 240px;
     }
     .topbar input{
       border:none; outline:none; background:transparent; width:100%;
-      font-size:14px; color: #1a2238;
+      font-size:14px; color: var(--ink);
     }
-    .topbar .actions{ display:flex; align-items:center; gap:10px; flex-wrap: wrap; }
+    :root[data-theme="dark"] .topbar input{ color: var(--text); }
     .chip{
       padding: 8px 12px; border-radius: 999px; font-size: 12px;
       border:1px solid rgba(var(--white),.28); background: rgba(var(--white),.18);
     }
+
+    /* Profile/Notif Buttons */
+    .icon-btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      width:40px; height:40px; border-radius: 12px;
+      border:1px solid rgba(var(--white),.28); background: rgba(var(--white),.18);
+      cursor:pointer; transition: transform .15s ease, box-shadow .25s ease, background .25s ease;
+    }
+    .icon-btn:hover{ transform: translateY(-1px); box-shadow: 0 10px 26px rgba(0,0,0,.16); background: rgba(var(--white),.24);}
+
+    .menu{ position: relative; }
+    .menu .panel{
+      position:absolute; right:0; top: calc(100% + 8px);
+      min-width: 240px; border-radius: 14px; padding: 10px;
+      transform-origin: top right; transform: scale(.96);
+      opacity:0; pointer-events:none;
+      transition: transform .18s ease, opacity .18s ease;
+      z-index: 70;
+    }
+    .menu.open .panel{ transform: scale(1); opacity:1; pointer-events: auto; }
+
+    .panel .row{ display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:10px; }
+    .panel .row:hover{ background: rgba(var(--white),.18); }
 
     /* -----------------------------
        Content Grid
@@ -240,7 +292,10 @@
       overflow: hidden;
       position: relative;
       color:#0f1a2e;
+      will-change: transform, box-shadow;
     }
+    :root[data-theme="dark"] .bank-card{ color: var(--text); }
+    .bank-card:hover{ transform: translateY(-2px); box-shadow: 0 16px 40px rgba(0,0,0,.18); }
     .bank-card .row{
       display:flex; align-items:center; justify-content: space-between;
     }
@@ -261,13 +316,16 @@
     }
     .pair{ display:flex; gap:24px; font-size: 12px; align-items: end; }
     .pair small{ display:block; color:#334268; margin-bottom:4px; }
+    :root[data-theme="dark"] .pair small{ color: var(--text-dim); }
     .pair strong{ font-size:14px; color:#0b1430; }
+    :root[data-theme="dark"] .pair strong{ color: var(--text); }
 
     /* Mastercard logo lockup */
     .brand-logos{
       position:absolute; right:16px; bottom:16px; display:flex; align-items:center; gap:8px;
       font-weight:700; color:#0b1430; opacity:.9;
     }
+    :root[data-theme="dark"] .brand-logos{ color: var(--text); }
     .mc{
       position: relative; width:44px; height:28px;
     }
@@ -292,7 +350,7 @@
     }
     @keyframes spin{ to{ transform: rotate(360deg); } }
 
-    /* KPIs / Balance tiles */
+    /* KPI tiles */
     .tile{
       grid-column: span 4;
       padding: 20px;
@@ -300,8 +358,10 @@
       display:flex; flex-direction:column; gap: 6px;
     }
     .tile h6{ margin:0; font-size: 12px; color: #334268; letter-spacing: .5px; text-transform: uppercase; }
+    :root[data-theme="dark"] .tile h6{ color: var(--text-dim); }
     .tile .value{ font-size: 26px; font-weight: 800; color:#0b1430; }
-    .tile .delta{ font-size: 12px; color:#2e7d32; }
+    :root[data-theme="dark"] .tile .value{ color: var(--text); }
+    .tile .delta{ font-size: 12px; color:var(--green); }
 
     /* Tables (glass) */
     .table-card{
@@ -312,9 +372,18 @@
     table{
       width:100%; border-collapse: collapse; font-size: 14px; color:#0b1430;
     }
+    :root[data-theme="dark"] table{ color: var(--text); }
     thead{ background: rgba(var(--white),.22); }
     th, td{ padding: 12px 14px; border-bottom: 1px solid rgba(0,0,0,.06); }
+    :root[data-theme="dark"] th, :root[data-theme="dark"] td{ border-bottom-color: rgba(255,255,255,.08); }
     tbody tr:hover{ background: rgba(var(--white),.24); }
+
+    /* Mini chart card */
+    .chart-card{
+      grid-column: span 12;
+      padding: 20px;
+      border-radius: var(--radius-lg);
+    }
 
     /* Responsive spans */
     @media (max-width: 1200px){
@@ -338,6 +407,7 @@
       transition: transform .15s ease, box-shadow .25s ease, background .25s ease;
       text-decoration:none; color:#0b1430; font-weight:600;
     }
+    :root[data-theme="dark"] .btn{ color: var(--text); }
     .btn:hover{ transform: translateY(-1px); box-shadow: 0 10px 26px rgba(0,0,0,.16); background: rgba(var(--white),.24);}
     .btn-light{ background: rgba(255,255,255,.85); border-color: rgba(255,255,255,.9); }
     .btn-light:hover{ background: #fff; }
@@ -376,7 +446,9 @@
       <div class="divider"></div>
 
       <div class="user">
-        <div class="avatar" aria-hidden="true"></div>
+        <div class="avatar" aria-hidden="true">
+          <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=256&auto=format&fit=crop" alt="">
+        </div>
         <div class="meta">
           <div class="name">Asriel Nhembo</div>
           <div class="role">Premium Member</div>
@@ -393,13 +465,46 @@
     <section>
       <!-- Topbar -->
       <div class="topbar glass" role="search">
-        <div class="search">
-          <i class="bi bi-search" aria-hidden="true"></i>
-          <label for="search" class="sr-only">Search</label>
-          <input id="search" type="search" placeholder="Search transactions, cards, reports…" aria-label="Search">
+        <div class="left" style="flex:1; gap:12px;">
+          <div class="search" style="flex:1;">
+            <i class="bi bi-search" aria-hidden="true"></i>
+            <label for="search" class="sr-only">Search</label>
+            <input id="search" type="search" placeholder="Search transactions, cards, reports…" aria-label="Search">
+          </div>
         </div>
-        <div class="actions">
+
+        <div class="right">
           <span class="chip" aria-live="polite">Status: Online</span>
+
+          <!-- Dark mode toggle -->
+          <button id="themeToggle" class="icon-btn glass" aria-label="Toggle dark mode" title="Toggle theme">
+            <i class="bi bi-moon-stars" id="themeIcon"></i>
+          </button>
+
+          <!-- Notifications menu -->
+          <div class="menu" id="notifMenu">
+            <button class="icon-btn glass" aria-haspopup="true" aria-expanded="false" aria-controls="notifPanel" title="Notifications">
+              <i class="bi bi-bell"></i>
+            </button>
+            <div id="notifPanel" class="panel glass" role="menu" aria-label="Notifications">
+              <div class="row"><i class="bi bi-credit-card"></i> <span>Your card **** 4567 was used for $120</span></div>
+              <div class="row"><i class="bi bi-shield-check"></i> <span>New login from Chrome browser</span></div>
+              <div class="row"><i class="bi bi-envelope"></i> <span>Monthly statement is ready</span></div>
+            </div>
+          </div>
+
+          <!-- Profile menu -->
+          <div class="menu" id="profileMenu">
+            <button class="icon-btn glass" aria-haspopup="true" aria-expanded="false" aria-controls="profilePanel" title="Account">
+              <i class="bi bi-person-circle"></i>
+            </button>
+            <div id="profilePanel" class="panel glass" role="menu" aria-label="Profile">
+              <div class="row"><i class="bi bi-person"></i> <span>My Profile</span></div>
+              <div class="row"><i class="bi bi-gear"></i> <span>Preferences</span></div>
+              <div class="row"><i class="bi bi-box-arrow-right"></i> <span>Sign Out</span></div>
+            </div>
+          </div>
+
           <a class="btn-light btn" href="/new-transfer"><i class="bi bi-arrow-left-right"></i> New Transfer</a>
         </div>
       </div>
@@ -510,12 +615,18 @@
         <div class="tile glass">
           <h6>Expenses</h6>
           <div class="value">$1,650</div>
-          <div class="delta" style="color:#c0392b;"><i class="bi bi-arrow-down-right"></i> -2.1%</div>
+          <div class="delta" style="color:var(--red);"><i class="bi bi-arrow-down-right"></i> -2.1%</div>
+        </div>
+
+        <!-- Chart Card (Interactive) -->
+        <div class="chart-card glass">
+          <h3 style="margin:0 0 10px; font-size:16px; color:var(--ink);">Income vs Expenses (YTD)</h3>
+          <canvas id="mainChart" height="120" aria-label="Income and Expenses Chart"></canvas>
         </div>
 
         <!-- Recent Transactions -->
         <div class="table-card glass">
-          <h3 style="margin:6px 12px 12px; font-size:16px; color:#1a2238;">Recent Transactions</h3>
+          <h3 style="margin:6px 12px 12px; font-size:16px; color:var(--ink);">Recent Transactions</h3>
           <table aria-label="Recent Transactions">
             <thead>
               <tr>
@@ -530,19 +641,19 @@
                 <td>2025-07-10</td>
                 <td>Payment — Utilities</td>
                 <td>Household</td>
-                <td style="text-align:right; color:#c0392b;">- $200.00</td>
+                <td style="text-align:right; color:var(--red);">- $200.00</td>
               </tr>
               <tr>
                 <td>2025-07-08</td>
                 <td>Salary</td>
                 <td>Income</td>
-                <td style="text-align:right; color:#2e7d32;">+ $3,500.00</td>
+                <td style="text-align:right; color:var(--green);">+ $3,500.00</td>
               </tr>
               <tr>
                 <td>2025-07-05</td>
                 <td>Groceries</td>
                 <td>Food</td>
-                <td style="text-align:right; color:#c0392b;">- $150.00</td>
+                <td style="text-align:right; color:var(--red);">- $150.00</td>
               </tr>
             </tbody>
           </table>
@@ -550,7 +661,7 @@
 
         <!-- Monthly Report -->
         <div class="table-card glass">
-          <h3 style="margin:6px 12px 12px; font-size:16px; color:#1a2238;">Monthly Report</h3>
+          <h3 style="margin:6px 12px 12px; font-size:16px; color:var(--ink);">Monthly Report</h3>
           <table aria-label="Monthly Report">
             <thead>
               <tr>
@@ -563,20 +674,20 @@
             <tbody>
               <tr>
                 <td>June</td>
-                <td style="color:#2e7d32;">+ $5,000</td>
-                <td style="color:#c0392b;">- $1,800</td>
+                <td style="color:var(--green);">+ $5,000</td>
+                <td style="color:var(--red);">- $1,800</td>
                 <td style="text-align:right; font-weight:700;">$3,200</td>
               </tr>
               <tr>
                 <td>May</td>
-                <td style="color:#2e7d32;">+ $4,200</td>
-                <td style="color:#c0392b;">- $1,600</td>
+                <td style="color:var(--green);">+ $4,200</td>
+                <td style="color:var(--red);">- $1,600</td>
                 <td style="text-align:right; font-weight:700;">$2,600</td>
               </tr>
               <tr>
                 <td>April</td>
-                <td style="color:#2e7d32;">+ $4,100</td>
-                <td style="color:#c0392b;">- $1,500</td>
+                <td style="color:var(--green);">+ $4,100</td>
+                <td style="color:var(--red);">- $1,500</td>
                 <td style="text-align:right; font-weight:700;">$2,600</td>
               </tr>
             </tbody>
@@ -587,7 +698,7 @@
     </section>
   </main>
 
-  <!-- Tiny JS to toggle sidebar on mobile + backdrop -->
+  <!-- Interactions: sidebar toggle, backdrop, theme, menus, charts -->
   <script>
     const toggle = document.getElementById('sidebarToggle');
     const sidebar = document.getElementById('sidebar');
@@ -600,12 +711,118 @@
       backdrop.setAttribute('aria-hidden', open ? 'false' : 'true');
       if(open){ sidebar.focus?.(); }
     }
-
     toggle?.addEventListener('click', () => setOpen(!sidebar.classList.contains('open')));
     backdrop?.addEventListener('click', () => setOpen(false));
-    document.addEventListener('keydown', (e) => {
-      if(e.key === 'Escape') setOpen(false);
+    document.addEventListener('keydown', (e) => { if(e.key === 'Escape') setOpen(false); });
+
+    /* Theme (Dark/Light) */
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    const root = document.documentElement;
+
+    function applyTheme(mode){
+      root.setAttribute('data-theme', mode);
+      localStorage.setItem('sb-theme', mode);
+      themeIcon.className = mode === 'dark' ? 'bi bi-sun' : 'bi bi-moon-stars';
+      themeToggle.title = mode === 'dark' ? 'Switch to light mode' : 'Switch to dark mode';
+    }
+    const saved = localStorage.getItem('sb-theme');
+    applyTheme(saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+    themeToggle.addEventListener('click', () => {
+      const mode = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      applyTheme(mode);
     });
+
+    /* Menus (notifications & profile) */
+    function wireMenu(menuId){
+      const wrap = document.getElementById(menuId);
+      const btn = wrap.querySelector('button');
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const open = !wrap.classList.contains('open');
+        document.querySelectorAll('.menu').forEach(m => m.classList.remove('open'));
+        wrap.classList.toggle('open', open);
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+    }
+    wireMenu('notifMenu');
+    wireMenu('profileMenu');
+    document.addEventListener('click', () => {
+      document.querySelectorAll('.menu').forEach(m => m.classList.remove('open'));
+    });
+
+    /* Chart.js — Interactive line chart */
+    const ctx = document.getElementById('mainChart');
+    const gradient = ctx.getContext('2d').createLinearGradient(0,0,0,200);
+    gradient.addColorStop(0, 'rgba(99, 102, 241, .35)');
+    gradient.addColorStop(1, 'rgba(99, 102, 241, 0)');
+
+    const dark = () => root.getAttribute('data-theme') === 'dark';
+    let chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+        datasets: [
+          {
+            label: 'Income',
+            data: [4000,4200,5000,4780,5890,6390,6600,6450,6900,7200,7300,7600],
+            tension: .35,
+            borderWidth: 3,
+            borderColor: '#4ade80',
+            fill: false,
+            pointRadius: 0,
+            hoverRadius: 5
+          },
+          {
+            label: 'Expenses',
+            data: [2400,2200,2800,2000,2781,2900,3000,3200,3100,3300,3500,3600],
+            tension: .35,
+            borderWidth: 3,
+            borderColor: '#f87171',
+            fill: false,
+            pointRadius: 0,
+            hoverRadius: 5
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: {
+            labels: { color: dark() ? '#e6ebff' : '#1a2238' }
+          },
+          tooltip: {
+            backgroundColor: 'rgba(0,0,0,.6)',
+            borderColor: 'rgba(255,255,255,.2)',
+            borderWidth: 1,
+            padding: 10,
+            displayColors: false
+          }
+        },
+        scales: {
+          x: {
+            ticks: { color: dark() ? '#a8b1d1' : '#3b465e' },
+            grid: { color: dark() ? 'rgba(255,255,255,.08)' : 'rgba(0,0,0,.06)' }
+          },
+          y: {
+            ticks: { color: dark() ? '#a8b1d1' : '#3b465e' },
+            grid: { color: dark() ? 'rgba(255,255,255,.08)' : 'rgba(0,0,0,.06)' }
+          }
+        }
+      }
+    });
+
+    /* Update chart colors on theme change */
+    const observer = new MutationObserver(() => {
+      chart.options.plugins.legend.labels.color = dark() ? '#e6ebff' : '#1a2238';
+      chart.options.scales.x.ticks.color = dark() ? '#a8b1d1' : '#3b465e';
+      chart.options.scales.y.ticks.color = dark() ? '#a8b1d1' : '#3b465e';
+      chart.options.scales.x.grid.color = dark() ? 'rgba(255,255,255,.08)' : 'rgba(0,0,0,.06)';
+      chart.options.scales.y.grid.color = dark() ? 'rgba(255,255,255,.08)' : 'rgba(0,0,0,.06)';
+      chart.update('none');
+    });
+    observer.observe(root, { attributes:true, attributeFilter:['data-theme'] });
   </script>
 </body>
 </html>
