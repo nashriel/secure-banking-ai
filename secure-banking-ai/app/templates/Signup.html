@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>SecureBank — Sign Up</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+
+  <style>
+    body,html {
+      height: 100%;
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #dfe9f3, #ffffff00);
+    }
+
+    .bg {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(800px 800px at 20% 20%, #9ad0ff55, transparent 60%),
+                  radial-gradient(700px 700px at 80% 80%, #c49bff55, transparent 60%);
+      z-index: -1;
+    }
+
+    .glass {
+      background: rgba(255,255,255,0.14);
+      border: 1px solid rgba(255,255,255,0.28);
+      backdrop-filter: blur(20px) saturate(180%);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+      border-radius: 20px;
+      padding: 40px;
+      width: 400px;
+      max-width: 90%;
+      color: #0b1020;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 24px;
+      font-size: 24px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+    label {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(0,0,0,0.1);
+      outline: none;
+      font-size: 14px;
+      transition: 0.2s;
+    }
+    input:focus {
+      border-color: #2e7d32;
+      box-shadow: 0 0 0 3px rgba(46,125,50,0.2);
+    }
+
+    .btn {
+      display: inline-block;
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      border: none;
+      background: #2e7d32;
+      color: white;
+      font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.25s;
+    }
+    .btn:hover {
+      background: #256628;
+    }
+
+    .footer-text {
+      margin-top: 16px;
+      font-size: 14px;
+      text-align: center;
+      color: #3b465e;
+    }
+    .footer-text a {
+      color: #2e7d32;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .footer-text a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="bg"></div>
+
+  <div class="glass">
+    <h2><i class="bi bi-person-plus"></i> Sign Up</h2>
+    <form>
+      <div class="form-group">
+        <label for="fullname">Full Name</label>
+        <input type="text" id="fullname" placeholder="Enter your full name" required>
+      </div>
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" placeholder="Enter your email" required>
+      </div>
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" placeholder="Choose a username" required>
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Create a password" required>
+      </div>
+      <div class="form-group">
+        <label for="confirm">Confirm Password</label>
+        <input type="password" id="confirm" placeholder="Confirm your password" required>
+      </div>
+      <button type="submit" class="btn">Create Account</button>
+    </form>
+    <div class="footer-text">
+      Already have an account? <a href="login.html">Log In</a>
+    </div>
+  </div>
+</body>
+</html>
+
