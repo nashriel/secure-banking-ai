@@ -7,8 +7,8 @@ def welcome():
 
 @app.route("/login")
 def login():
-    # Temporary shortcut until login form is built
-    return redirect(url_for("dashboard"))
+    return render_template("Login.html")
+
 
 @app.route("/register")
 def register():
