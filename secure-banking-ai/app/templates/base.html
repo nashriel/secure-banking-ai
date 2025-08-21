@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SecureBank - Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #dfe9f3 0%, #ffffff 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 40px;
+    }
+
+    .balance-card {
+      position: relative;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 24px;
+      padding: 30px;
+      color: #1c1c1c;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .balance-card:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+    }
+
+    .balance-card h6 {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: rgba(0, 0, 0, 0.7);
+      margin-bottom: 10px;
+    }
+
+    .balance-card h3,
+    .balance-card h4 {
+      font-weight: 700;
+      margin: 0;
+      color: #111;
+    }
+
+    .container {
+      max-width: 1100px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Financial Cards -->
+    <div class="row g-4 mb-5">
+      <div class="col-md-4">
+        <div class="balance-card">
+          <h6>Current Balance</h6>
+          <h3>$12,350.00</h3>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="balance-card">
+          <h6>Income</h6>
+          <h4>$4,000</h4>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="balance-card">
+          <h6>Expenses</h6>
+          <h4>$1,650</h4>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

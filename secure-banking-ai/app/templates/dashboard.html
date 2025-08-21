@@ -2,232 +2,610 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>SecureBank - Dashboard</title>
+  <title>SecureBank — Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
-  <link href="{{ url_for('static', filename='css/dashboard.css') }}" rel="stylesheet" />
+
+  <!-- Icons (Bootstrap Icons) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
   <style>
-    body {
-      background-color: #1b2e1b;
-      font-family: 'Segoe UI', sans-serif;
-      color: #e0f2f1;
+    /* -----------------------------
+       Base / Reset
+    ------------------------------*/
+    *, *::before, *::after { box-sizing: border-box; }
+    :root{
+      --text: #0b1020;
+      --text-dim: #3b465e;
+      --white: 255,255,255;
+      --glass: rgba(255,255,255,.14);
+      --border: rgba(255,255,255,.28);
+      --shadow: 0 10px 40px rgba(0,0,0,.25);
+      --radius-xl: 24px;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+    }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Inter, sans-serif;
+      color: var(--text);
+      overflow-x: hidden;
+      background: #eaf2ff;
     }
 
-    /* Sidebar */
-    .sidebar {
-      background-color: #1b5e20;
-      min-height: 100vh;
-      padding: 1.5rem 1rem;
+    /* -----------------------------
+       Liquid Background (animated blobs)
+    ------------------------------*/
+    .bg{
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(1200px 1200px at 20% 10%, #9ad0ff55 0%, transparent 60%),
+                  radial-gradient(900px 900px at 80% 30%, #c49bff55 0%, transparent 60%),
+                  radial-gradient(1000px 1000px at 40% 90%, #9affcc55 0%, transparent 60%),
+                  linear-gradient(135deg,#dfe9f3,#ffffff);
+      z-index:-2;
     }
-    .sidebar h4 {
-      color: #c8e6c9;
+    .bg--blur{
+      position: fixed;
+      inset: -10px;
+      filter: blur(40px) saturate(120%);
+      z-index:-1;
+      animation: float 14s ease-in-out infinite alternate;
     }
-    .sidebar .nav-link {
-      color: #e0f2f1;
-      margin-bottom: 1rem;
-      font-weight: 500;
-      transition: background 0.3s;
+    .bg--blur::before,
+    .bg--blur::after{
+      content:"";
+      position:absolute;
+      width:60vmin; height:60vmin;
+      border-radius:50%;
+      background: radial-gradient(circle at 30% 30%, #6db7ff 0%, #6db7ff00 60%);
+      top:10%; left:8%;
+      filter: blur(30px);
+      animation: blob 18s ease-in-out infinite alternate;
+      mix-blend-mode: screen;
     }
-    .sidebar .nav-link:hover {
-      background-color: #2e7d32;
-      border-radius: 8px;
+    .bg--blur::after{
+      background: radial-gradient(circle at 70% 50%, #7ef1c5 0%, #7ef1c500 60%);
+      top:55%; left:60%;
+      animation-duration: 22s;
+    }
+    @keyframes float{ from{ transform: translateY(-10px); } to{ transform: translateY(10px); } }
+    @keyframes blob{ 0%{ transform: translate(0,0) scale(1); } 100%{ transform: translate(40px,-30px) scale(1.15); } }
+
+    /* -----------------------------
+       Layout
+    ------------------------------*/
+    .app{
+      display: grid;
+      grid-template-columns: 280px minmax(0,1fr);
+      gap: 28px;
+      padding: 28px;
+      min-height: 100dvh;
+      padding-top: clamp(28px, 28px + env(safe-area-inset-top), 48px); /* extra breathing room under Menu btn */
+    }
+    @media (max-width: 960px){
+      .app{ grid-template-columns: 1fr; padding: 20px; padding-top: calc(72px + env(safe-area-inset-top)); }
     }
 
-    /* Navbar */
-    .navbar {
-      background-color: #2e7d32 !important;
-    }
-    .navbar-brand, .navbar-text {
-      color: #ffffff !important;
-    }
-
-    /* Cards */
-    .card-base {
-      background-color: #33691e;
-      border-radius: 12px;
-      color: #e0f2f1;
-      opacity: 0;
-      transform: translateY(20px);
-      animation: fadeUp 0.6s ease-out forwards;
-    }
-    .balance-card {
-      background-color: #2e7d32;
-      border-radius: 12px;
-      color: #ffffff;
-      opacity: 0;
-      transform: translateY(20px);
-      animation: fadeUp 0.6s ease-out forwards;
-    }
-    .table-responsive {
-      opacity: 0;
-      transform: translateY(20px);
-      animation: fadeUp 0.6s ease-out forwards;
+    /* -----------------------------
+       Glass primitives
+    ------------------------------*/
+    .glass{
+      background: var(--glass);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      box-shadow: var(--shadow);
     }
 
-    /* Animation */
-    @keyframes fadeUp {
-      to {
-        opacity: 1;
-        transform: translateY(0);
+    /* -----------------------------
+       Sidebar (floating, glass)
+    ------------------------------*/
+    .sidebar{
+      position: sticky;
+      top: 20px;
+      align-self: start;
+      border-radius: var(--radius-xl);
+      padding: 18px;
+      color: rgba(0,0,0,.85);
+      max-height: calc(100dvh - 40px);
+      overflow: auto;
+    }
+    .brand{
+      display:flex; align-items:center; gap:12px;
+      padding: 8px 10px 16px;
+    }
+    .brand i{
+      font-size: 22px;
+      padding: 10px;
+      border-radius: 14px;
+      background: rgba(var(--white),.18);
+      border:1px solid rgba(var(--white),.28);
+      backdrop-filter: blur(10px);
+    }
+    .brand h1{
+      font-size: 18px; margin:0; letter-spacing:.3px; font-weight: 700;
+    }
+    .nav{
+      display:flex; flex-direction:column; gap:8px; margin: 6px 0 16px;
+    }
+    .nav a{
+      display:flex; align-items:center; gap:12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      color: var(--text);
+      text-decoration:none;
+      transition: transform .18s ease, background .25s ease, box-shadow .25s ease;
+      border:1px solid transparent;
+    }
+    .nav a i{ font-size: 18px; opacity:.9; }
+    .nav a:hover{
+      transform: translateX(4px);
+      background: rgba(var(--white),.22);
+      border-color: rgba(var(--white),.32);
+      box-shadow: 0 8px 22px rgba(0,0,0,.15);
+    }
+    .nav a.active{
+      background: rgba(var(--white),.26);
+      border-color: rgba(var(--white),.38);
+      box-shadow: 0 10px 26px rgba(0,0,0,.18) inset, 0 8px 22px rgba(0,0,0,.12);
+    }
+
+    .sidebar .divider{
+      height:1px; background: rgba(var(--white),.28);
+      margin: 14px 6px;
+    }
+    .user{
+      display:flex; align-items:center; gap:12px; padding: 8px 10px;
+    }
+    .avatar{
+      width:38px; height:38px; border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #fff 0%, #ffffff55 35%, #ffffff20 70%);
+      border:1px solid rgba(var(--white),.35);
+    }
+    .user .meta{ line-height: 1.2; }
+    .user .meta .name{ font-weight:700; font-size: 14px; }
+    .user .meta .role{ font-size: 12px; color: var(--text-dim); }
+
+    /* Mobile collapse */
+    .sidebar-toggle{
+      display:none;
+      position: fixed;
+      top: calc(16px + env(safe-area-inset-top));
+      left: calc(16px + env(safe-area-inset-left));
+      z-index: 50;
+      padding:12px 14px; border-radius: 14px;
+      line-height: 1;
+    }
+    .sidebar-toggle i{ font-size: 18px; }
+    .sidebar-toggle .label{ margin-left: 6px; } /* extra space after icon label */
+
+    @media (max-width: 960px){
+      .sidebar{
+        position: fixed; inset: 0 auto 0 0; width: 86%; max-width: 320px;
+        transform: translateX(-110%); transition: transform .35s ease; z-index: 60;
       }
-    }
-    .card-base:hover,
-    .balance-card:hover,
-    .table-responsive:hover {
-      transform: scale(1.02);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+      .sidebar.open{ transform: translateX(0); }
+      .sidebar-toggle{ display:inline-flex; align-items:center; gap:8px; }
     }
 
-    /* Tables */
-    .table-dark {
-      background-color: #1b5e20;
-      color: #ffffff;
+    /* Backdrop when sidebar opens (prevents overlap/conflict) */
+    .backdrop{
+      position: fixed; inset: 0; background: rgba(0,0,0,.28);
+      opacity: 0; pointer-events: none; transition: opacity .25s ease; z-index: 55;
     }
-    .table-hover tbody tr:hover {
-      background-color: #2e7d32;
+    .backdrop.show{ opacity: 1; pointer-events: auto; }
+
+    /* -----------------------------
+       Topbar (inside main)
+    ------------------------------*/
+    .topbar{
+      display:flex; align-items:center; gap:12px; justify-content: space-between;
+      margin-bottom: 18px; padding: 14px 16px;
+      border-radius: var(--radius-lg);
+    }
+    @media (max-width:960px){
+      .topbar{ margin-top: 4px; } /* breathing space under fixed Menu btn */
+    }
+    .topbar .search{
+      display:flex; align-items:center; gap:10px; flex: 1 1 420px;
+      padding: 10px 12px; border-radius: 12px;
+      background: rgba(var(--white),.18); border:1px solid rgba(var(--white),.28);
+    }
+    .topbar input{
+      border:none; outline:none; background:transparent; width:100%;
+      font-size:14px; color: #1a2238;
+    }
+    .topbar .actions{ display:flex; align-items:center; gap:10px; flex-wrap: wrap; }
+    .chip{
+      padding: 8px 12px; border-radius: 999px; font-size: 12px;
+      border:1px solid rgba(var(--white),.28); background: rgba(var(--white),.18);
     }
 
-    h5, h6 {
-      color: #c8e6c9;
+    /* -----------------------------
+       Content Grid
+    ------------------------------*/
+    .content{
+      display:grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 20px;
     }
-    .card-text {
-      color: #ffffff;
+    .card{ padding: 18px; border-radius: var(--radius-lg); }
+
+    /* Virtual bank cards */
+    .bank-card{
+      grid-column: span 6;
+      padding: 22px;
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      position: relative;
+      color:#0f1a2e;
     }
-    .text-success {
-      color: #a5d6a7 !important;
+    .bank-card .row{
+      display:flex; align-items:center; justify-content: space-between;
     }
-    .text-danger {
-      color: #ef9a9a !important;
+    .bank-card .brand-mini{
+      display:flex; align-items:center; gap:10px; font-weight:700;
     }
+    .emv{
+      width:50px; height:34px;
+      border-radius:8px;
+      background: linear-gradient(135deg,#ffd86a,#ffb56b);
+      border:1px solid rgba(255,255,255,.6);
+      box-shadow: inset 0 0 22px rgba(0,0,0,.2);
+      display:flex; align-items:center; justify-content:center;
+      overflow:hidden;
+    }
+    .number{
+      font-size: 1.3rem; letter-spacing: 3px; margin: 16px 0 8px;
+    }
+    .pair{ display:flex; gap:24px; font-size: 12px; align-items: end; }
+    .pair small{ display:block; color:#334268; margin-bottom:4px; }
+    .pair strong{ font-size:14px; color:#0b1430; }
+
+    /* Mastercard logo lockup */
+    .brand-logos{
+      position:absolute; right:16px; bottom:16px; display:flex; align-items:center; gap:8px;
+      font-weight:700; color:#0b1430; opacity:.9;
+    }
+    .mc{
+      position: relative; width:44px; height:28px;
+    }
+    .mc .r, .mc .y{
+      position:absolute; top:0; width:28px; height:28px; border-radius:50%;
+      mix-blend-mode:multiply; opacity:.95;
+    }
+    .mc .r{ left:0; background:#eb001b; }
+    .mc .y{ right:0; background:#f79e1b; }
+    .mc .overlap{
+      position:absolute; left:8px; top:0; width:28px; height:28px; border-radius:50%; background:#ff5f1f; opacity:.9;
+      mix-blend-mode:multiply;
+    }
+
+    /* Animated sheen on card */
+    .sheen{
+      pointer-events: none;
+      position:absolute; inset:-30% -40%;
+      background: conic-gradient(from 0deg at 50% 50%, #ffffff90 0deg, #ffffff10 80deg, #ffffff00 120deg, #ffffff40 200deg, #ffffff00 360deg);
+      mix-blend-mode: overlay; filter: blur(30px);
+      animation: spin 12s linear infinite;
+    }
+    @keyframes spin{ to{ transform: rotate(360deg); } }
+
+    /* KPIs / Balance tiles */
+    .tile{
+      grid-column: span 4;
+      padding: 20px;
+      border-radius: var(--radius-lg);
+      display:flex; flex-direction:column; gap: 6px;
+    }
+    .tile h6{ margin:0; font-size: 12px; color: #334268; letter-spacing: .5px; text-transform: uppercase; }
+    .tile .value{ font-size: 26px; font-weight: 800; color:#0b1430; }
+    .tile .delta{ font-size: 12px; color:#2e7d32; }
+
+    /* Tables (glass) */
+    .table-card{
+      grid-column: span 6;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+    table{
+      width:100%; border-collapse: collapse; font-size: 14px; color:#0b1430;
+    }
+    thead{ background: rgba(var(--white),.22); }
+    th, td{ padding: 12px 14px; border-bottom: 1px solid rgba(0,0,0,.06); }
+    tbody tr:hover{ background: rgba(var(--white),.24); }
+
+    /* Responsive spans */
+    @media (max-width: 1200px){
+      .bank-card{ grid-column: span 12; }
+      .tile{ grid-column: span 6; }
+      .table-card{ grid-column: span 12; }
+    }
+    @media (max-width: 640px){
+      .tile{ grid-column: span 12; }
+    }
+
+    /* -----------------------------
+       Utility buttons
+    ------------------------------*/
+    .btn{
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 10px 14px; border-radius: 12px;
+      border:1px solid rgba(var(--white),.28);
+      background: rgba(var(--white),.18);
+      cursor:pointer;
+      transition: transform .15s ease, box-shadow .25s ease, background .25s ease;
+      text-decoration:none; color:#0b1430; font-weight:600;
+    }
+    .btn:hover{ transform: translateY(-1px); box-shadow: 0 10px 26px rgba(0,0,0,.16); background: rgba(var(--white),.24);}
+    .btn-light{ background: rgba(255,255,255,.85); border-color: rgba(255,255,255,.9); }
+    .btn-light:hover{ background: #fff; }
+
+    /* Visually-hidden for a11y */
+    .sr-only{ position:absolute; width:1px; height:1px; padding:0; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
   </style>
 </head>
 <body>
-  <div class="d-flex">
-    <!-- Sidebar -->
-    <div class="sidebar">
-      <h4 class="mb-4">SecureBank</h4>
-      <ul class="nav flex-column">
-        <li class="nav-item">
-          <a class="nav-link" href="#"><i class="bi bi-house-door me-2"></i>Dashboard</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#"><i class="bi bi-credit-card me-2"></i>Cards</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#"><i class="bi bi-cash-stack me-2"></i>Transactions</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#"><i class="bi bi-file-earmark-text me-2"></i>Reports</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#"><i class="bi bi-gear me-2"></i>Settings</a>
-        </li>
-      </ul>
-    </div>
+  <!-- Liquid background layers -->
+  <div class="bg"></div>
+  <div class="bg--blur"></div>
 
-    <!-- Main Content -->
-    <div class="flex-grow-1">
-      <!-- Navbar -->
-      <nav class="navbar navbar-expand-lg sticky-top shadow-sm rounded-4 mx-3 mt-3">
-        <div class="container-fluid">
-          <a class="navbar-brand fw-bold" href="#">SecureBank</a>
-          <div class="ms-auto d-flex align-items-center">
-            <span class="navbar-text me-3">Welcome, Asriel</span>
-            <a href="/" class="btn btn-outline-light btn-sm">Logout</a>
-          </div>
-        </div>
+  <!-- Mobile toggle (fixed, with extra spacing so it never overlaps) -->
+  <button class="sidebar-toggle glass btn" aria-controls="sidebar" aria-expanded="false" id="sidebarToggle">
+    <i class="bi bi-list" aria-hidden="true"></i><span class="label">Menu</span>
+  </button>
+  <div id="backdrop" class="backdrop" aria-hidden="true"></div>
+
+  <main class="app">
+    <!-- Sidebar -->
+    <aside class="sidebar glass" id="sidebar" aria-label="Main Navigation">
+      <div class="brand">
+        <i class="bi bi-shield-lock"></i>
+        <h1>SecureBank</h1>
+      </div>
+
+      <nav class="nav" role="navigation">
+        <a class="active" href="#"><i class="bi bi-grid-1x2"></i> Dashboard</a>
+        <a href="#"><i class="bi bi-credit-card-2-front"></i> Cards</a>
+        <a href="#"><i class="bi bi-cash-coin"></i> Transactions</a>
+        <a href="#"><i class="bi bi-graph-up"></i> Reports</a>
+        <a href="#"><i class="bi bi-gear"></i> Settings</a>
       </nav>
 
-      <!-- Dashboard -->
-      <div class="container py-5">
-        <div class="row mb-5">
-          <!-- Debit Card -->
-          <div class="col-md-6 mb-4">
-            <div class="card-base p-4 shadow">
-              <div class="d-flex justify-content-between align-items-center mb-3">
-                <div>
-                  <h5 class="mb-0">SecureBank</h5>
-                  <small>Virtual Debit Card</small>
-                </div>
-                <img src="{{ url_for('static', filename='img/chip.png') }}" alt="chip" style="width:40px;" />
-              </div>
-              <div class="card-number mb-3">**** **** **** 2048</div>
-              <div class="d-flex justify-content-between">
-                <div>
-                  <small>Card Holder</small>
-                  <div class="fw-bold">Asriel Nhembo</div>
-                </div>
-                <div class="text-end">
-                  <small>Valid Thru</small>
-                  <div class="fw-bold">12/27</div>
-                </div>
-              </div>
+      <div class="divider"></div>
+
+      <div class="user">
+        <div class="avatar" aria-hidden="true"></div>
+        <div class="meta">
+          <div class="name">Asriel Nhembo</div>
+          <div class="role">Premium Member</div>
+        </div>
+      </div>
+
+      <div style="margin-top:14px; display:flex; gap:10px;">
+        <a class="btn" href="/profile"><i class="bi bi-person"></i> Profile</a>
+        <a class="btn" href="/"><i class="bi bi-box-arrow-right"></i> Logout</a>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <section>
+      <!-- Topbar -->
+      <div class="topbar glass" role="search">
+        <div class="search">
+          <i class="bi bi-search" aria-hidden="true"></i>
+          <label for="search" class="sr-only">Search</label>
+          <input id="search" type="search" placeholder="Search transactions, cards, reports…" aria-label="Search">
+        </div>
+        <div class="actions">
+          <span class="chip" aria-live="polite">Status: Online</span>
+          <a class="btn-light btn" href="/new-transfer"><i class="bi bi-arrow-left-right"></i> New Transfer</a>
+        </div>
+      </div>
+
+      <!-- Content grid -->
+      <div class="content">
+        <!-- Virtual Debit Card -->
+        <div class="card glass bank-card" aria-label="Virtual Debit Card">
+          <div class="sheen"></div>
+          <div class="row">
+            <div class="brand-mini">
+              <i class="bi bi-shield-check" aria-hidden="true"></i> SecureBank • Debit
+            </div>
+            <!-- Realistic EMV Chip (SVG inside fancy chip housing) -->
+            <div class="emv" aria-hidden="true">
+              <svg width="40" height="26" viewBox="0 0 80 52" aria-hidden="true">
+                <rect x="1" y="1" width="78" height="50" rx="8" ry="8" fill="url(#g1)" stroke="rgba(0,0,0,.15)"/>
+                <defs>
+                  <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0" stop-color="#ffe08a"/>
+                    <stop offset="1" stop-color="#ffb76a"/>
+                  </linearGradient>
+                </defs>
+                <g stroke="#ba8b3c" stroke-width="3" fill="none" opacity=".9">
+                  <path d="M10 10h20v12H10zM50 10h20v12H50zM10 30h20v12H10zM50 30h20v12H50z"/>
+                  <path d="M30 16h20M30 36h20M40 10v12M40 30v12"/>
+                </g>
+              </svg>
             </div>
           </div>
-
-          <!-- Credit Card -->
-          <div class="col-md-6 mb-4">
-            <div class="card-base p-4 shadow">
-              <div class="d-flex justify-content-between align-items-center mb-3">
-                <div>
-                  <h5 class="mb-0">SecureBank</h5>
-                  <small>Virtual Credit Card</small>
-                </div>
-                <img src="{{ url_for('static', filename='img/chip.png') }}" alt="chip" style="width:40px;" />
-              </div>
-              <div class="card-number mb-3">**** **** **** 9976</div>
-              <div class="d-flex justify-content-between">
-                <div>
-                  <small>Card Holder</small>
-                  <div class="fw-bold">Asriel Nhembo</div>
-                </div>
-                <div class="text-end">
-                  <small>Valid Thru</small>
-                  <div class="fw-bold">11/29</div>
-                </div>
-              </div>
+          <div class="number" aria-label="Card Number">**** **** **** 2048</div>
+          <div class="pair">
+            <div>
+              <small>Card Holder</small>
+              <strong>Asriel Nhembo</strong>
             </div>
+            <div>
+              <small>Valid Thru</small>
+              <strong>12/27</strong>
+            </div>
+          </div>
+          <!-- Mastercard logo lockup -->
+          <div class="brand-logos" aria-hidden="true" title="Mastercard">
+            <div class="mc">
+              <div class="r"></div>
+              <div class="y"></div>
+              <div class="overlap"></div>
+            </div>
+            <span>Mastercard</span>
           </div>
         </div>
 
-        <!-- Financial Cards -->
-        <div class="row g-4 mb-5">
-          <div class="col-md-4">
-            <div class="card balance-card shadow text-center p-3">
-              <h6 class="card-title">Current Balance</h6>
-              <h3 class="card-text">$12,350.00</h3>
+        <!-- Virtual Credit Card -->
+        <div class="card glass bank-card" aria-label="Virtual Credit Card">
+          <div class="sheen"></div>
+          <div class="row">
+            <div class="brand-mini">
+              <i class="bi bi-shield-check" aria-hidden="true"></i> SecureBank • Credit
+            </div>
+            <div class="emv" aria-hidden="true">
+              <svg width="40" height="26" viewBox="0 0 80 52" aria-hidden="true">
+                <rect x="1" y="1" width="78" height="50" rx="8" ry="8" fill="url(#g2)" stroke="rgba(0,0,0,.15)"/>
+                <defs>
+                  <linearGradient id="g2" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0" stop-color="#ffe08a"/>
+                    <stop offset="1" stop-color="#ffb76a"/>
+                  </linearGradient>
+                </defs>
+                <g stroke="#ba8b3c" stroke-width="3" fill="none" opacity=".9">
+                  <path d="M10 10h20v12H10zM50 10h20v12H50zM10 30h20v12H10zM50 30h20v12H50z"/>
+                  <path d="M30 16h20M30 36h20M40 10v12M40 30v12"/>
+                </g>
+              </svg>
             </div>
           </div>
-          <div class="col-md-4">
-            <div class="card balance-card shadow text-center p-3">
-              <h6 class="card-title">Income</h6>
-              <h4 class="card-text text-success">+ $4,000</h4>
+          <div class="number" aria-label="Card Number">**** **** **** 9976</div>
+          <div class="pair">
+            <div>
+              <small>Card Holder</small>
+              <strong>Asriel Nhembo</strong>
+            </div>
+            <div>
+              <small>Valid Thru</small>
+              <strong>11/29</strong>
             </div>
           </div>
-          <div class="col-md-4">
-            <div class="card balance-card shadow text-center p-3">
-              <h6 class="card-title">Expenses</h6>
-              <h4 class="card-text text-danger">- $1,200</h4>
+          <div class="brand-logos" aria-hidden="true" title="Mastercard">
+            <div class="mc">
+              <div class="r"></div>
+              <div class="y"></div>
+              <div class="overlap"></div>
             </div>
+            <span>Mastercard</span>
           </div>
         </div>
 
-        <!-- Tables Section -->
-        <div class="row g-4">
-          <!-- Recent Transactions -->
-          <div class="col-md-6">
-            <h5 class="mb-3">Recent Transactions</h5>
-            <div class="table-responsive shadow rounded-4 overflow-hidden">
-              <table class="table table-hover table-bordered mb-0">
-                <thead class="table-dark">
-                  <tr>
-                    <th>Date</th>
-                    <th>Description</th>
-                    <th>Amount</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>2025-07-10</td>
+        <!-- KPI tiles -->
+        <div class="tile glass">
+          <h6>Current Balance</h6>
+          <div class="value">$12,350.00</div>
+          <div class="delta"><i class="bi bi-arrow-up-right"></i> +3.4% MoM</div>
+        </div>
+        <div class="tile glass">
+          <h6>Income</h6>
+          <div class="value">$4,000</div>
+          <div class="delta"><i class="bi bi-arrow-up-right"></i> +5.2%</div>
+        </div>
+        <div class="tile glass">
+          <h6>Expenses</h6>
+          <div class="value">$1,650</div>
+          <div class="delta" style="color:#c0392b;"><i class="bi bi-arrow-down-right"></i> -2.1%</div>
+        </div>
+
+        <!-- Recent Transactions -->
+        <div class="table-card glass">
+          <h3 style="margin:6px 12px 12px; font-size:16px; color:#1a2238;">Recent Transactions</h3>
+          <table aria-label="Recent Transactions">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Description</th>
+                <th>Category</th>
+                <th style="text-align:right;">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>2025-07-10</td>
+                <td>Payment — Utilities</td>
+                <td>Household</td>
+                <td style="text-align:right; color:#c0392b;">- $200.00</td>
+              </tr>
+              <tr>
+                <td>2025-07-08</td>
+                <td>Salary</td>
+                <td>Income</td>
+                <td style="text-align:right; color:#2e7d32;">+ $3,500.00</td>
+              </tr>
+              <tr>
+                <td>2025-07-05</td>
+                <td>Groceries</td>
+                <td>Food</td>
+                <td style="text-align:right; color:#c0392b;">- $150.00</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Monthly Report -->
+        <div class="table-card glass">
+          <h3 style="margin:6px 12px 12px; font-size:16px; color:#1a2238;">Monthly Report</h3>
+          <table aria-label="Monthly Report">
+            <thead>
+              <tr>
+                <th>Month</th>
+                <th>Income</th>
+                <th>Expenses</th>
+                <th style="text-align:right;">Net</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>June</td>
+                <td style="color:#2e7d32;">+ $5,000</td>
+                <td style="color:#c0392b;">- $1,800</td>
+                <td style="text-align:right; font-weight:700;">$3,200</td>
+              </tr>
+              <tr>
+                <td>May</td>
+                <td style="color:#2e7d32;">+ $4,200</td>
+                <td style="color:#c0392b;">- $1,600</td>
+                <td style="text-align:right; font-weight:700;">$2,600</td>
+              </tr>
+              <tr>
+                <td>April</td>
+                <td style="color:#2e7d32;">+ $4,100</td>
+                <td style="color:#c0392b;">- $1,500</td>
+                <td style="text-align:right; font-weight:700;">$2,600</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <!-- Tiny JS to toggle sidebar on mobile + backdrop -->
+  <script>
+    const toggle = document.getElementById('sidebarToggle');
+    const sidebar = document.getElementById('sidebar');
+    const backdrop = document.getElementById('backdrop');
+
+    function setOpen(open){
+      sidebar.classList.toggle('open', open);
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      backdrop.classList.toggle('show', open);
+      backdrop.setAttribute('aria-hidden', open ? 'false' : 'true');
+      if(open){ sidebar.focus?.(); }
+    }
+
+    toggle?.addEventListener('click', () => setOpen(!sidebar.classList.contains('open')));
+    backdrop?.addEventListener('click', () => setOpen(false));
+    document.addEventListener('keydown', (e) => {
+      if(e.key === 'Escape') setOpen(false);
+    });
+  </script>
+</body>
+</html>

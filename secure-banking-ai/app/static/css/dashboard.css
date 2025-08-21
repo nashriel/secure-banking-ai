@@ -1,85 +1,116 @@
+body {
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  min-height: 100vh;
+  font-family: 'Inter', sans-serif;
+  color: white;
+}
 
-  body {
-    background-color: #e6f4ea;
-    font-family: 'Segoe UI', sans-serif;
-    color: #212529;
-  }
+/* Sidebar */
+.sidebar {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+  min-height: 100vh;
+  padding: 2rem 1rem;
+  box-shadow: 4px 0 20px rgba(0,0,0,0.3);
+}
+.sidebar h4 {
+  color: #fff;
+}
+.sidebar .nav-link {
+  color: rgba(255,255,255,0.8);
+  margin-bottom: 1rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  border-radius: 12px;
+  padding: 0.6rem 1rem;
+}
+.sidebar .nav-link:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
 
-  /* Sidebar */
-  .sidebar {
-    background-color: #c8e6c9;
-    min-height: 100vh;
-    padding: 1.5rem 1rem;
-  }
-  .sidebar h4 {
-    color: #2e7d32;
-  }
-  .sidebar .nav-link {
-    color: #2e7d32;
-    margin-bottom: 1rem;
-    font-weight: 500;
-    transition: background 0.3s;
-  }
-  .sidebar .nav-link:hover {
-    background-color: #a5d6a7;
-    border-radius: 8px;
-  }
+/* Navbar */
+.navbar {
+  background: rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: blur(12px);
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+.navbar-brand, .navbar-text {
+  color: #fff !important;
+}
+.btn-outline-light {
+  border-color: #fff;
+  color: #fff;
+}
+.btn-outline-light:hover {
+  background-color: #ffffff;
+  color: #203a43;
+}
 
-  /* Navbar */
-  .navbar {
-    background-color: #a5d6a7 !important;
-  }
-  .navbar-brand, .navbar-text {
-    color: #2e7d32 !important;
-  }
+/* Glass Cards */
+.card-base {
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+  transition: all 0.4s ease;
+  overflow: hidden;
+  position: relative;
+}
+.card-base:hover {
+  transform: scale(1.05);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+}
+.card-base::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+  animation: rotate 8s linear infinite;
+}
+@keyframes rotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.card-number {
+  font-size: 1.4rem;
+  letter-spacing: 3px;
+}
 
-  /* Buttons */
-  .btn-outline-light {
-    border-color: #2e7d32;
-    color: #2e7d32;
-  }
-  .btn-outline-light:hover {
-    background-color: #2e7d32;
-    color: #ffffff;
-  }
+/* Balance Cards */
+.balance-card {
+  border-radius: 20px;
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.25);
+  color: #fff;
+  transition: all 0.3s ease;
+  padding: 1.5rem;
+}
+.balance-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+}
 
-  /* Cards */
-  .card-base {
-    background-color: #ffffff;
-    border-radius: 12px;
-    color: #212529;
-    box-shadow: 0 0 10px rgba(0,0,0,0.05);
-    transition: transform 0.3s ease;
-  }
-  .balance-card {
-    background-color: #ffffff;
-    border-radius: 12px;
-    color: #2e7d32;
-    box-shadow: 0 0 10px rgba(0,0,0,0.05);
-    transition: transform 0.3s ease;
-  }
-  .card-base:hover,
-  .balance-card:hover {
-    transform: scale(1.02);
-    box-shadow: 0 0 15px rgba(0,0,0,0.1);
-  }
-
-  /* Tables */
-  .table-dark {
-    background-color: #2e7d32;
-    color: #ffffff;
-  }
-  .table-hover tbody tr:hover {
-    background-color: #e8f5e9;
-  }
-
-  /* Headings and Highlights */
-  h5, h6 {
-    color: #2e7d32;
-  }
-  .text-success {
-    color: #388e3c !important;
-  }
-  .text-danger {
-    color: #c62828 !important;
-  }
+/* Tables */
+.table {
+  color: #fff;
+}
+.table thead {
+  background: rgba(255,255,255,0.15);
+}
+.table-hover tbody tr:hover {
+  background: rgba(255,255,255,0.1);
+}
+.table td, .table th {
+  border-color: rgba(255,255,255,0.2) !important;
+}
