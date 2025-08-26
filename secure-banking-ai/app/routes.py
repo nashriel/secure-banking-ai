@@ -1,21 +1,25 @@
-from app import app
-from flask import render_template, redirect, url_for
+from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app
+from .models.models import db, Login, Transaction, Deposit, Withdrawal
 
-@app.route("/")
-def welcome():
-    return render_template("welcome.html")
+# If you want to use blueprints (recommended with app factory):
+main = Blueprint('main', __name__)
 
-@app.route("/login")
+# Example route
+@main.route('/')
+def index():
+    return render_template('welcome.html')
+
+@main.route("/login")
 def login():
     return render_template("Login.html")
 
 
-@app.route("/register")
+@main.route("/register")
 def register():
     # Temporary shortcut until registration is built
     return redirect(url_for("dashboard"))
 
-@app.route("/dashboard")
+@main.route("/dashboard")
 def dashboard():
     return render_template("dashboard.html")
 

@@ -16,7 +16,8 @@ def create_app():
     csrf = CSRFProtect(app)
 
     # Import routes after app is created
-    from app import routes
+    from app.routes import main
+    app.register_blueprint(main)
 
     with app.app_context():
         db.create_all()
