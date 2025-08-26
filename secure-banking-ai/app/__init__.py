@@ -1,9 +1,6 @@
 from flask import Flask
 from flask_wtf.csrf import CSRFProtect
 from .models.models import db
-from app import create_app
-
-app = create_app()
 
 def create_app():
     app = Flask(__name__)
@@ -21,13 +18,8 @@ def create_app():
     # Import routes after app is created
     from app import routes
 
+    with app.app_context():
+        db.create_all()
+
     return app
-
-with app.app_context():
-    # Create the database tables if they don't exist
-    db.create_all()
-
-    # Start the Flask shell
-    from flask import shell
-    shell()
 

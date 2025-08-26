@@ -30,6 +30,3 @@ class Withdrawal(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('login.id'))
     amount = db.Column(db.Numeric(10, 2))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-# Database configuration
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:Majid2468#$@localhost:5432/Banking System'
