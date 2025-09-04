@@ -1,13 +1,14 @@
-from flask_sqlalchemy import SQLAlchemy
+from app import db
 from datetime import datetime
-
-db = SQLAlchemy()
 
 class Login(db.Model):
     __tablename__ = 'login'
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(50))
+    fullname = db.Column(db.String(100))
+    email = db.Column(db.String(100), unique=True)
+    username = db.Column(db.String(50), unique=True)
     password = db.Column(db.String(100))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 class Transaction(db.Model):
     __tablename__ = 'transaction'
